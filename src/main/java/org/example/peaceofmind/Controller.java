@@ -182,10 +182,11 @@ public class Controller {
         return null;
     }
 
-//    @RequestMapping(value = "/topQuotes/{feeling}", method = RequestMethod.GET)
-//    public List<String> topQuotes() {
-//
-//    }
+    @RequestMapping(value = "/topQuotes/{feeling}", method = RequestMethod.GET)
+    public List<String> topQuotes() {
+        return new ArrayList<>();
+
+    }
 
 
 }
