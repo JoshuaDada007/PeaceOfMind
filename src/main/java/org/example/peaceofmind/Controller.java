@@ -25,29 +25,34 @@ public class Controller {
 
 
 //    @Scheduled(cron = "*/3 * * * * *")
+
+    // Create a random user with a unique token
     @RequestMapping(value = "/createUser", method = RequestMethod.POST)
-    public void createUser() {
+    // modelAttribute helps properly map the inputs in the form to Java objects
+    public User createUser(@ModelAttribute User user) {
         String token = RandomStringUtils.randomAlphanumeric(10);
-        String username = RandomStringUtils.randomAlphabetic(6);
-
-
+        user.setToken(user.getToken());
+        user.setUsername(user.getUsername());
+        user.setToken(token);
+        userDAO.create(user);
+        return user;
+    }
+    @Scheduled(cron = "*/3 * * * * *")
+    @RequestMapping(value = "/createRandomUser", method = RequestMethod.POST)
+    public void createRandomUser() {
+        String token = RandomStringUtils.randomAlphanumeric(10);
+        String username = RandomStringUtils.randomAlphanumeric(10);
+        String email = RandomStringUtils.randomAlphanumeric(10);
         User user = new User();
-
         user.setToken(token);
         user.setUsername(username);
+        user.setEmail(email + "@ggc.edu");
         userDAO.create(user);
-        if (user.getId() % 3 != 0 || user.getId() % 5 == 0) {
-            user.setEmail(username + "@ggc.edu");
-            userDAO.update(user);
-        } else {
-            user.setEmail(null);
-            System.out.println("***************** \n User created");
-            userDAO.update(user);
-        }
-
     }
 
 //    @Scheduled(cron = "*/3 * * * * *")
+
+    // creating random quotes in the database
     @RequestMapping(value = "/createQuotes", method = RequestMethod.POST)
     public void createQuotes() {
         Random r = new Random();
@@ -62,7 +67,8 @@ public class Controller {
         quotesDAO.create(q);
     }
 
-//    @Scheduled(cron = "*/3 * * * * *")
+    //    @Scheduled(cron = "*/3 * * * * *")
+    //Create Random music for the database
     @RequestMapping(value = "/createMusic", method = RequestMethod.POST)
     public void createMusic() {
         Random r = new Random();
@@ -87,6 +93,7 @@ public class Controller {
         User user = userDAO.get(id);
         if (user != null) {
             user.setUsername(updatedUser.getUsername());
+            user.setEmail(updatedUser.getEmail());
             userDAO.update(user);
         }
     }
@@ -96,7 +103,7 @@ public class Controller {
         userDAO.delete(id);
     }
 
-    @RequestMapping(value = "/addfavQuotes/{feeling}/{token}/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/getfavQuotes/{token}/{feeling}/{id}", method = RequestMethod.GET)
     public List<String> addFavQuotes(@PathVariable String feeling, @PathVariable String token, @PathVariable int id) {
         User user = userDAO.getByToken(token);
         Quotes q = quotesDAO.get(id);
@@ -129,17 +136,18 @@ public class Controller {
 
     }
 
-    @RequestMapping(value = "/byToken/{token}", method = RequestMethod.GET)
-    public User byToken(@PathVariable String token) {
-        userDAO.getByToken(token).addFavQuotes().add("Hello");
-        userDAO.getByToken(token).addFavQuotes().add("Hey");
-        userDAO.getByToken(token).addFavQuotes().add("Goodbye");
-        for (String str : userDAO.getByToken(token).addFavQuotes()) {
-            System.out.println(str);
-        }
-        return userDAO.getByToken(token);
-    }
+//    @RequestMapping(value = "/byToken/{token}", method = RequestMethod.GET)
+//    public User byToken(@PathVariable String token) {
+//        userDAO.getByToken(token).addFavQuotes().add("Hello");
+//        userDAO.getByToken(token).addFavQuotes().add("Hey");
+//        userDAO.getByToken(token).addFavQuotes().add("Goodbye");
+//        for (String str : userDAO.getByToken(token).addFavQuotes()) {
+//            System.out.println(str);
+//        }
+//        return userDAO.getByToken(token);
+//    }
 
+    // This displays a random quote based on how you're feeling
     @RequestMapping(value = "getRandomQuote/{feeling}", method = RequestMethod.GET)
     public String getRandomQuote(@PathVariable String feeling) {
         Random r = new Random();
@@ -160,33 +168,57 @@ public class Controller {
         return null;
     }
 
-//        @Scheduled(cron = "*/3 * * * * *")
-    @RequestMapping(value = "/emailAlerts", method = RequestMethod.GET)
-    public List<String> emailAlerts() {
-        Random r = new Random();
-        int randQuoteNum = r.nextInt(quotesDAO.getAll().size());
-        int randMusicNum = r.nextInt(musicDAO.getAll().size());
-        Quotes q = quotesDAO.get(randQuoteNum);
-        Music m = musicDAO.get(randMusicNum);
-        int size = userDAO.getAll().size();
-            User user = userDAO.get(r.nextInt(size) + 1);
-            if (user.getEmail() != null) {
-                user.myAlert().add("Artist: " + m.getArtist() +
-                        "\\nTitle: " + m.getTitle() +
-                        "\\nMotivation: " + q.getMotivation());
-                userDAO.update(user);
-                return user.myAlert();
-            } else{
-                System.out.println(user.getUsername() + "This user does not have an email");
-            }
-        return null;
-    }
+    //        @Scheduled(cron = "*/3 * * * * *")
+
+//    @RequestMapping(value = "/emailAlerts", method = RequestMethod.GET)
+//    public List<String> emailAlerts() {
+//        Random r = new Random();
+//        int randQuoteNum = r.nextInt(quotesDAO.getAll().size());
+//        int randMusicNum = r.nextInt(musicDAO.getAll().size());
+//        Quotes q = quotesDAO.get(randQuoteNum);
+//        Music m = musicDAO.get(randMusicNum);
+//        int size = userDAO.getAll().size();
+//        User user = userDAO.get(r.nextInt(size) + 1);
+//        if (user.getEmail() != null) {
+//            user.myAlert().add("Artist: " + m.getArtist() +
+//                    "\\nTitle: " + m.getTitle() +
+//                    "\\nMotivation: " + q.getMotivation());
+//            userDAO.update(user);
+//            return user.myAlert();
+//        } else {
+//            System.out.println(user.getUsername() + "This user does not have an email");
+//        }
+//        return null;
+//    }
 
     @RequestMapping(value = "/topQuotes/{feeling}", method = RequestMethod.GET)
     public List<String> topQuotes() {
         return new ArrayList<>();
 
     }
+@Scheduled(cron = "0 0 0 * * 0")
+    @RequestMapping(value = "/sendEmailAlert", method = RequestMethod.GET)
+    public void sendEmailAlert() {
+        Random r = new Random();
+        int randQuoteNum = r.nextInt(quotesDAO.getAll().size());
+        int randMusicNum = r.nextInt(musicDAO.getAll().size());
+        Quotes q = quotesDAO.get(randQuoteNum);
+        Music m = musicDAO.get(randMusicNum);
+        List<Integer> users = userDAO.getAll();
+       for(int i = 0; i < users.size(); i++) {
+           User user = userDAO.get(users.get(i));
+           if(user.getEmail() != null) {
+               user.getEmailAlerts().add("Artist: " + m.getArtist() +
+                    "\\nTitle: " + m.getTitle() +
+                    "\\nMotivation: " + q.getMotivation()
+               );
+               userDAO.update(user);
+               System.out.println("Email for: " +  user.getUsername() + "\n" + user.getEmailAlerts());
+           }
+       }
+    }
+
+
 
 
 }

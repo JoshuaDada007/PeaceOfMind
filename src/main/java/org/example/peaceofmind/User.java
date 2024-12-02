@@ -15,11 +15,14 @@ public class User {
     private String username;
     private String token;
     private String email;
+    @ElementCollection
+    private List<String> emailAlerts = new ArrayList<>();
     //creates a separate table for the favquote in the db and associating the value in the list with a primary key
     @ElementCollection
     private List<String> favQuotes = new ArrayList<>();
-@ElementCollection
-private List<String> myAlert = new ArrayList<>();
+    @ElementCollection
+    private List<String> myAlert = new ArrayList<>();
+
     public User() {
     }
 
@@ -65,10 +68,13 @@ private List<String> myAlert = new ArrayList<>();
         return favQuotes;
     }
 
-    public List<String> myAlert(){
+    public List<String> myAlert() {
         return myAlert;
     }
 
+    public List getEmailAlerts() {
+        return emailAlerts;
+    }
 
 
 }

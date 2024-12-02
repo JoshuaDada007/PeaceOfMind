@@ -1,0 +1,5 @@
+Using React with SpringBoot
+
+First we go to our terminal to initialize the react application by doing this
+npx -create-react-app #application name
+
