@@ -31,8 +31,10 @@ public class UserDAO {
                 .getSingleResult();
     }
 
-    public List<Integer> getAll(){
-       return  em.createNativeQuery("Select id From User").getResultList();
+
+
+    public List<Integer> getAllUserIds(){
+        return em.createNativeQuery("select id from User").getResultList();
     }
 
 

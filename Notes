@@ -2,4 +2,24 @@ Using React with SpringBoot
 
 First we go to our terminal to initialize the react application by doing this
 npx -create-react-app #application name
+What this does is it creates a react build based on the folder you installed it from
+
+Once its installed you have to open that file from your IDE
+In the terminal type npm start
+
+To start writing your react code, your function must be something like this
+
+export default function #functionName(){
+(
+return
+#html code
+)
+}
+
+This return value that we get from react is called a 'jsx' which is a javascript extension.
+Basically our html element which is returned in a js function
+
+
+
+
 

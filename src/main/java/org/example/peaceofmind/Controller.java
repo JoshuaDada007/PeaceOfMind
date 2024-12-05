@@ -6,7 +6,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -27,6 +29,7 @@ public class Controller {
 //    @Scheduled(cron = "*/3 * * * * *")
 
     // Create a random user with a unique token
+
     @RequestMapping(value = "/createUser", method = RequestMethod.POST)
     // modelAttribute helps properly map the inputs in the form to Java objects
     public User createUser(@ModelAttribute User user) {
@@ -34,11 +37,14 @@ public class Controller {
         user.setToken(user.getToken());
         user.setUsername(user.getUsername());
         user.setToken(token);
+        user.setDate(new Date());
         userDAO.create(user);
         return user;
     }
-    @Scheduled(cron = "*/3 * * * * *")
+
+    //    @Scheduled(cron = "*/3 * * * * *")
     @RequestMapping(value = "/createRandomUser", method = RequestMethod.POST)
+    @Scheduled(cron = "*/3 * * * * *")
     public void createRandomUser() {
         String token = RandomStringUtils.randomAlphanumeric(10);
         String username = RandomStringUtils.randomAlphanumeric(10);
@@ -47,6 +53,7 @@ public class Controller {
         user.setToken(token);
         user.setUsername(username);
         user.setEmail(email + "@ggc.edu");
+        user.setDate(new Date());
         userDAO.create(user);
     }
 
@@ -196,7 +203,8 @@ public class Controller {
         return new ArrayList<>();
 
     }
-@Scheduled(cron = "0 0 0 * * 0")
+
+//    @Scheduled(cron = "0 0 0 * * 0")
     @RequestMapping(value = "/sendEmailAlert", method = RequestMethod.GET)
     public void sendEmailAlert() {
         Random r = new Random();
@@ -204,21 +212,46 @@ public class Controller {
         int randMusicNum = r.nextInt(musicDAO.getAll().size());
         Quotes q = quotesDAO.get(randQuoteNum);
         Music m = musicDAO.get(randMusicNum);
-        List<Integer> users = userDAO.getAll();
-       for(int i = 0; i < users.size(); i++) {
-           User user = userDAO.get(users.get(i));
-           if(user.getEmail() != null) {
-               user.getEmailAlerts().add("Artist: " + m.getArtist() +
-                    "\\nTitle: " + m.getTitle() +
-                    "\\nMotivation: " + q.getMotivation()
-               );
-               userDAO.update(user);
-               System.out.println("Email for: " +  user.getUsername() + "\n" + user.getEmailAlerts());
-           }
-       }
+        List<Integer> users = userDAO.getAllUserIds();
+        for (int i = 0; i < users.size(); i++) {
+            User user = userDAO.get(users.get(i));
+            if (user.getEmail() != null) {
+                user.getEmailAlerts().add("Artist: " + m.getArtist() +
+                        "\\nTitle: " + m.getTitle() +
+                        "\\nMotivation: " + q.getMotivation()
+                );
+                userDAO.update(user);
+                System.out.println("Email for: " + user.getUsername() + "\n" + user.getEmailAlerts());
+            }
+        }
     }
 
+    @RequestMapping(value = "/getAllUserID", method = RequestMethod.GET)
+    public void getAllUsersIds() {
+        List<Integer> users = userDAO.getAllUserIds();
+        for (int i = 0; i < users.size(); i++) {
+            User user = userDAO.get(users.get(i));
+            System.out.println(i + ": " + user.getUsername());
+        }
 
 
+    }
+
+    @RequestMapping(value = "/pom/{userId}/log", method = RequestMethod.POST)
+    public List<String> userLogs(@RequestBody String text, @PathVariable int userId) {
+        LocalDate date = LocalDate.now();
+        for (int num : userDAO.getAllUserIds()) {
+            User user = userDAO.get(num);
+            if (userId == user.getId() ) {
+                user.journal().add(date + ":  " + text);
+                userDAO.update(user);
+                return user.journal();
+            }
+        }
+        return null;
+    }
 
 }
+
+
+
