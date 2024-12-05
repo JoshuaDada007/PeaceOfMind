@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.awt.image.CropImageFilter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -15,6 +16,8 @@ public class User {
     private String username;
     private String token;
     private String email;
+    private Date date;
+
     @ElementCollection
     private List<String> emailAlerts = new ArrayList<>();
     //creates a separate table for the favquote in the db and associating the value in the list with a primary key
@@ -22,6 +25,8 @@ public class User {
     private List<String> favQuotes = new ArrayList<>();
     @ElementCollection
     private List<String> myAlert = new ArrayList<>();
+    @ElementCollection
+    private List<String> journal = new ArrayList<>();
 
     public User() {
     }
@@ -60,6 +65,12 @@ public class User {
         return email;
     }
 
+    public void setDate(Date date) {
+        this.date = date;
+    }
+    public Date getDate() {
+        return date;
+    }
     public void setEmail(String email) {
         this.email = email;
     }
@@ -72,9 +83,15 @@ public class User {
         return myAlert;
     }
 
-    public List getEmailAlerts() {
+    public List<String> getEmailAlerts() {
         return emailAlerts;
     }
+
+    public List<String> journal() {
+        return journal;
+    }
+
+
 
 
 }
